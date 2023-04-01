@@ -1,6 +1,9 @@
 #include "rbtree.h"
 
 #include <stdlib.h>
+void leftRotate(rbtree *t, node_t *x);
+void rightRotate(rbtree *t, node_t *y);
+void rbtree_insert_fixUp(rbtree *t, node_t *z);
 
 rbtree *new_rbtree(void)
 {
@@ -53,6 +56,7 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
   {
     t->root = z;
   }
+  //  새로운 노드의 좌우결정
   else if (z->key < y->key)
   {
     y->left = z;
@@ -68,7 +72,8 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
 
   return t->root;
 }
-node_t *rbtree_insert_fixUp(rbtree *t, node_t *z)
+
+void rbtree_insert_fixUp(rbtree *t, node_t *z)
 {
   while (z->parent->color == RBTREE_RED)
   {
@@ -85,11 +90,11 @@ node_t *rbtree_insert_fixUp(rbtree *t, node_t *z)
       else if (z == z->parent->right)
       {
         z = z->parent;
-        // left-rotate(t, z)
+        leftRotate(t, z);
       }
       z->parent->color = RBTREE_BLACK;
       z->parent->parent->color = RBTREE_RED;
-      // right-rotate(t, z->parent->parent);
+      rightRotate(t, z->parent->parent);
     }
     else
     {
@@ -104,13 +109,63 @@ node_t *rbtree_insert_fixUp(rbtree *t, node_t *z)
       else if (z == z->parent->left)
       {
         z = z->parent;
-        // left-rotate(t, z)
+        rightRotate(t, z);
       }
       z->parent->color = RBTREE_BLACK;
       z->parent->parent->color = RBTREE_RED;
-      // right-rotate(t, z->parent->parent);
+      leftRotate(t, z->parent->parent);
     }
   }
+}
+
+void leftRotate(rbtree *t, node_t *x)
+{
+  node_t *y = x->right; // y를 설정
+  x->right = y->left;   // y의 왼쪽 서브트리를 x의 오른쪽으로 옮긴다.
+  if (y->left != t->nil)
+  {
+    y->left->parent = x; // y의 왼쪽 서브트리의 부모도 x로 지정
+  }
+  y->parent = x->parent; // x의 부모와 y를 연결
+  if (x->parent == t->nil)
+  {
+    t->root = y;
+  }
+  else if (x == x->parent->left) // x가 부모의 왼쪽 서브티리이면
+  {
+    x->parent->left = y; // 그 위치를 y와 연결
+  }
+  else
+  {
+    x->parent->right = y;
+  }
+  y->left = x;
+  x->parent = y;
+}
+
+void rightRotate(rbtree *t, node_t *y)
+{
+  node_t *x = y->left;    // x를 설정
+  y->left = x->right;     // y의 왼쪽 서브트리를 x의 오른쪽 서브트리로 설정
+  if (x->right != t->nil) // x의 오른쪽 서브트리가 nill이 아니면
+  {
+    x->right->parent = y; // x의 오른쪽과 y를 부모자식관계로 연결
+  }
+  x->parent = y->parent;   // y의 부모를 x의 부모로 변경
+  if (y->parent == t->nil) // y의 부모가 없으면
+  {
+    t->root = x; // x를 트리의 루트로 설정
+  }
+  else if (y == y->parent->left) // y가 y의 부모의 왼쪽이였으면
+  {
+    y->parent->left = x; // 똑같이 x를 y의 부모의 왼쪽으로 설정
+  }
+  else
+  {
+    y->parent->right = x; // x를 y의 부모의 오른쪽으로 설정
+  }
+  x->right = y;  // x의 오른쪽을 y로 설정
+  y->parent = x; // y의 부모를 x로 설정
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key)
