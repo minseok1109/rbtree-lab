@@ -9,12 +9,15 @@ rbtree *new_rbtree(void)
 {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
   // TODO: initialize struct if needed
+  // 새로운 노드 생성 및 설정
   node_t *newNode = (node_t *)calloc(1, sizeof(node_t));
   newNode->color = RBTREE_BLACK;
   newNode->left = p->nil;
   newNode->right = p->nil;
   newNode->parent = p->nil;
   newNode->key = 0;
+
+  // 생성한 노드를 루트로 설정
   p->root = newNode;
   p->nil = p->root;
 
@@ -40,21 +43,21 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
   while (x != t->nil)
   {
     y = x;
-    if (z->key < x->key)
+    if (z->key < x->key) // x의 key보다 작으면 왼쪽
     {
       x = x->left;
     }
     else
     {
-      x = x->right;
+      x = x->right; // 아니면 오른쪽
     }
   }
 
-  z->parent = y;
+  z->parent = y; // 새로운 노드의 부모를 y로 설정
 
   if (y == t->nil)
   {
-    t->root = z;
+    t->root = z; // y가 빈 노드면 새로운 노드를 루트로 설정
   }
   //  새로운 노드의 좌우결정
   else if (z->key < y->key)
@@ -75,28 +78,31 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
 
 void rbtree_insert_fixUp(rbtree *t, node_t *z)
 {
-  while (z->parent->color == RBTREE_RED)
+  while (z->parent->color == RBTREE_RED) // 새로 삽입한 노드의 부모가 빨간색이면
   {
-    if (z->parent == z->parent->parent->left)
+    if (z->parent == z->parent->parent->left) // 새로운 노드의 부모가 할아버지 노드의 왼쪽이면
     {
-      node_t *y = z->parent->parent->right;
-      if (y->color == RBTREE_RED)
+      node_t *y = z->parent->parent->right; // 삼촌 노드
+      // case 1
+      if (y->color == RBTREE_RED) // 삼촌노드가 빨간색이면
       {
-        z->parent->color = RBTREE_BLACK;
-        y->color = RBTREE_BLACK;
-        z->parent->parent->color = RBTREE_RED;
-        z = z->parent->parent;
+        z->parent->color = RBTREE_BLACK;       // 새로운 노드의 부모를 검은색으로 변경
+        y->color = RBTREE_BLACK;               // 삼촌노드의 색깔도 검은색으로 변경
+        z->parent->parent->color = RBTREE_RED; // 할아버지 노드의 색깔을 빨강으로 변경
+        z = z->parent->parent;                 // z의 위치를 z의 할아버지로 변경
       }
+      // case 2
       else if (z == z->parent->right)
       {
         z = z->parent;
         leftRotate(t, z);
       }
+      // case 3
       z->parent->color = RBTREE_BLACK;
       z->parent->parent->color = RBTREE_RED;
       rightRotate(t, z->parent->parent);
     }
-    else
+    else // 새로운 노드의 부모가 할아버지 노드의 오른쪽이면
     {
       node_t *y = z->parent->parent->left;
       if (y->color == RBTREE_RED)
