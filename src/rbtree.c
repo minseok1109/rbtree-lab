@@ -242,7 +242,25 @@ void rightRotate(rbtree *t, node_t *y)
 node_t *rbtree_find(const rbtree *t, const key_t key)
 {
   // TODO: implement find
-  return t->root;
+  // 루트
+  node_t *x = t->root;
+
+  while (x != t->nil)
+  {
+    if (x->key == key)
+    {
+      return x;
+    }
+    else if (key > x->key)
+    {
+      x = x->right;
+    }
+    else
+    {
+      x = x->left;
+    }
+  }
+  return t->nil;
 }
 node_t *rbtree_min(const rbtree *t)
 {
@@ -253,6 +271,7 @@ node_t *rbtree_min(const rbtree *t)
 node_t *rbtree_max(const rbtree *t)
 {
   // TODO: implement find
+
   return t->root;
 }
 
