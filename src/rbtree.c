@@ -45,9 +45,23 @@ rbtree *new_rbtree(void)
   return p;
 }
 
+void delete_rbtree_post_order_traversal(node_t *node, node_t *nil)
+{
+  if (node == nil)
+  {
+    return;
+  }
+
+  delete_rbtree_post_order_traversal(node->left, nil);
+  delete_rbtree_post_order_traversal(node->right, nil);
+  free(node);
+}
+
 void delete_rbtree(rbtree *t)
 {
   // TODO: reclaim the tree nodes's memory
+  delete_rbtree_post_order_traversal(t->root, t->nil);
+  free(t->nil);
   free(t);
 }
 
@@ -230,7 +244,6 @@ node_t *rbtree_find(const rbtree *t, const key_t key)
   // TODO: implement find
   return t->root;
 }
-
 node_t *rbtree_min(const rbtree *t)
 {
   // TODO: implement find
