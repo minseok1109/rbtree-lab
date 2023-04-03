@@ -1,8 +1,10 @@
 #include "rbtree.h"
+#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
     rbtree *t = new_rbtree();
-    node_t *n = rbtree_insert(t, 1);
+    rbtree_insert(t, 11);
+
     return 0;
 }
