@@ -427,8 +427,23 @@ int rbtree_erase(rbtree *t, node_t *z)
   return 0;
 }
 
+void tree_to_array(node_t *node, key_t *arr, node_t *nil, int *index, size_t n)
+{
+  if (node == nil || *index > n)
+  {
+    return;
+  }
+  tree_to_array(node->left, arr, nil, index, n);
+  if (*index < n)
+  {
+    arr[(*index)++] = node->key;
+  }
+  tree_to_array(node->right, arr, nil, index, n);
+}
+
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n)
 {
-
+  int index = 0;
+  tree_to_array(t->root, arr, t->nil, &index, n);
   return 1;
 }
